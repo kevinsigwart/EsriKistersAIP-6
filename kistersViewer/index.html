@@ -1,0 +1,153 @@
+<!DOCTYPE HTML>
+<html> 
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>
+</title>
+<link rel="stylesheet" type="text/css" href="http://gisweb.kisters.de/kiWidgets/0.8/widgets/themes/kisters.css"/>
+<link rel="stylesheet" href="http://js.arcgis.com/3.7/js/dojo/dijit/themes/claro/claro.css">    
+<link rel="stylesheet" href="http://js.arcgis.com/3.7/js/esri/css/esri.css">
+<!--link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Nunito"-->
+<!--link rel="stylesheet" type="text/css" href="http://js.arcgis.com/3.6/js/esri/css/esri.css" /-->
+<!--link rel="stylesheet" href="http://js.arcgis.com/3.7/js/esri/css/esri.css"-->
+<link rel="stylesheet" type="text/css" href="css/layout.css">
+<link rel="stylesheet" type="text/css" href="css/chromepopup.css">
+
+<script type="text/javascript">
+  var dojoConfig = {
+    parseOnLoad: true,
+	packages:[
+	{name:"kisters",location: "http://gisweb.kisters.de/kiWidgets/0.82/"},	
+	 {name:"esriTemplate",location:location.pathname.replace(/\/[^/]+$/, '')}
+	  
+	]
+  };
+</script>
+
+<script type="text/javascript" src="http://js.arcgis.com/3.7/init.js"></script>
+<!--script type="text/javascript" src="http://js.arcgis.com/3.7/"></script-->
+
+<!--script src="http://d3js.org/d3.v3.min.js"></script-->
+<script src="lib/d3/d3.v3.min.js"></script>
+
+<script type="text/javascript">
+dojo.require("dijit.dijit"); // optimize: load dijit layer
+dojo.require("dijit.layout.BorderContainer");
+dojo.require("dijit.layout.ContentPane");
+dojo.require("dijit.layout.StackContainer");
+dojo.requireLocalization("esriTemplate","template");
+</script>
+
+<script src="javascript/config.js" type="text/javascript"></script>
+<script type="text/javascript" src="javascript/layout.js">
+</script>
+
+<script type="text/javascript" src="javascript/mapping.js"></script>
+<script type="text/javascript" src="javascript/charting.js"></script>
+<script type="text/javascript" src="javascript/eventSlider.js"></script>
+
+<script type="text/javascript">      
+var configOptions;
+
+function init(){
+
+configOptions = {
+  //The ID for the map from ArcGIS.com
+  webmap : "56106bdcd93d4c9ab0de78d0c8cdaabd",
+  //Enter a title, if no title is specified, the webmap's title is used.
+  title : "",
+  //Enter a subtitle, if not specified the ArcGIS.com web map's summary is used
+  subtitle : "",
+  //If the webmap uses Bing Maps data, you will need to provided your Bing Maps Key
+  bingmapskey : "",
+  //specify a proxy url if needed
+  proxyurl:"",
+  //specify the url to a geometry service 
+  geometryserviceurl:"http://tasks.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer",
+ //Modify this to point to your sharing service URL if you are using the portal
+  sharingurl : "http://www.arcgis.com/sharing/content/items"
+};
+
+ initMap();
+
+}
+//show map on load 
+dojo.addOnLoad(init);
+</script>
+</head>
+
+<body onResize="resetLayout()"  class="claro">
+	
+<div id="mainWindow" data-dojo-type="dijit.layout.BorderContainer"  data-dojo-props='design:"headline",gutters:false' style="width:100%; height:100%;">
+
+<!-- Header Section-->
+<div id="header" data-dojo-type="dijit.layout.ContentPane" data-dojo-props='region:"top"'>
+  <div id="title">
+  </div>
+  <div id="subtitle">
+  </div>
+<div id="header_flourish"></div>
+
+</div>
+
+
+<!-- Map Section -->
+<div id="map" data-dojo-type="dijit.layout.ContentPane" data-dojo-props='region:"center"' style='padding:0px'>
+
+	<div style="position:absolute; right:20px; top:75px; z-Index:997;">
+          <div data-dojo-type="dijit/TitlePane"data-dojo-props="title:'Graph   ', closable:false,  open:false">
+            <div data-dojo-type="dijit/layout/ContentPane" style="width:135px; height:25px; overflow:auto;">
+            	<label>Add to Graph:</label>
+				<button id="drawKistersBtn" style="margin: -2px;width: 30px;cursor:pointer;"   onmouseover="dijit.Tooltip.defaultPosition=['above', 'below']" onclick="kistersButtonClicked();" ><img src="./images/edit_markertool.png"/></button>
+				<div class="dijitHidden"><span data-dojo-type="dijit.Tooltip" data-dojo-props="connectId:'drawKistersBtn'">Kisters Widget</span></div>
+            </div>
+          </div>
+    </div>
+
+	<div id="timePanel" class="panel_content" data-dojo-type="dijit.layout.ContentPane" style="position:absolute;left:450px; top:25px;z-Index:999;height:25px">
+		<div id="time" style="position:center; height:25px" ></div>
+	</div>
+
+	<div style="position:absolute; right:20px; top:5px; z-Index:999;">
+          <div data-dojo-type="dijit/TitlePane" data-dojo-props="title:'Basemap', closable:false,  open:false">
+            <div data-dojo-type="dijit/layout/ContentPane" style="width:275px; height:110px; overflow:auto;">
+            	<div id="basemapGallery"></div>
+        	</div>
+          </div>
+    </div>
+    
+	<div style="position:absolute; right:20px; top:40px; z-Index:998;">
+          <div data-dojo-type="dijit/TitlePane" data-dojo-props="title:'Animate', closable:false,  open:false">
+            <div data-dojo-type="dijit/layout/ContentPane" style="width:250px; height:30px; overflow:auto;">
+            	<button id="animPlayBtn" style="margin: -2px;width: 30px;cursor:pointer;"   onmouseover="dijit.Tooltip.defaultPosition=['above', 'below']" onclick="animationPlay();" ><img src="./images/Button-Play-16.png"/></button>
+            	<div class="dijitHidden"><span data-dojo-type="dijit.Tooltip" data-dojo-props="connectId:'animPlayBtn'">Animate</span></div>
+            	<button id="animBackwordBtn" style="margin: 2px;width: 30px;cursor:pointer;"   onmouseover="dijit.Tooltip.defaultPosition=['above', 'below']" onclick="animationGoBackward();" ><img src="./images/Button-Prev-16.png"/></button>
+            	<div class="dijitHidden"><span data-dojo-type="dijit.Tooltip" data-dojo-props="connectId:'animBackwordBtn'">Previous Event</span></div>
+            	<!--button id="animBackwordBtn" style="margin: 2px;width: 30px;height: 28px;background:url(./images/Button-Previous-25.png) no-repeat;"></button-->
+            	<label id="animationDateTimeLabel">Thu Dec 31 2009</label>
+            	<button id="animForwardBtn" style="margin: 2px;width: 30px;cursor:pointer;"   onmouseover="dijit.Tooltip.defaultPosition=['above', 'below']" onclick="animationGoForward();" ><img src="./images/Button-Next-16.png"/></button>
+            	<div class="dijitHidden"><span data-dojo-type="dijit.Tooltip" data-dojo-props="connectId:'animForwardBtn'">Next Event</span></div>
+        	</div>
+          </div>
+    </div>
+</div>
+
+
+    
+<!-- Footer Section-->
+
+<div id="footer" data-dojo-type="dijit.layout.ContentPane" data-dojo-props='region:"bottom"'>    
+	<div id="panel" class="panel_content" data-dojo-type="dijit.layout.ContentPane">
+		<div id="tsWidget" ></div>
+	</div>
+	<div id="timeSliderFooter" data-dojo-type="dijit.layout.ContentPane" data-dojo-props='region:"bottom"'>
+		<!--div <span id="timeSliderLabel"> </span>-->
+		<!--div id="timeSliderDiv"></div-->
+		<div id="eventSliderPanel" class="panel_content" data-dojo-type="dijit.layout.ContentPane">
+	</div>
+
+</div>
+
+</body>
+
+</html>
